@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.KeyVault.Models;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace proto_azure_pgp
 {
     class Program
     {
-        static void Main(string[] args)
+        private static ClientAssertionCertificate Cert { get; set; }
+        private static KeyVaultClient Client { get; set; } 
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
@@ -20,10 +27,27 @@ namespace proto_azure_pgp
             Console.WriteLine($"cert collection count: {certCollection.Count}");
             if (certCollection.Count > 0)
             {
-                X509Certificate2 cert = certCollection[0];
+                X509Certificate2 rawCert = certCollection[0];
                 // Use certificate
-                Console.WriteLine($"friendly name: {cert.FriendlyName}");
-                Console.WriteLine($"subject: {cert.Subject}");
+                Console.WriteLine($"friendly name: {rawCert.FriendlyName}");
+                Console.WriteLine($"subject: {rawCert.Subject}");
+                var appId = Environment.GetEnvironmentVariable("APPLICATION_ID");
+                Cert = Cert ?? new ClientAssertionCertificate(appId, rawCert);
+
+                var vaultKeyPrefix = Environment.GetEnvironmentVariable("VAULT_KEY_PREFIX");
+                var vaultUrl = Environment.GetEnvironmentVariable("VAULT_URL");
+                Client = Client ?? new KeyVaultClient(GetAccessTokenAsync);
+
+                var secret = new SecretBundle();
+                secret = await Client.GetSecretAsync(vaultUrl, $"{vaultKeyPrefix}-public");
+                Regex.Unescape(secret.Value);
+                Console.WriteLine("public fetched");
+                secret = await Client.GetSecretAsync(vaultUrl, $"{vaultKeyPrefix}-private");
+                Regex.Unescape(secret.Value);
+                Console.WriteLine("private fetched");
+                secret = await Client.GetSecretAsync(vaultUrl, $"{vaultKeyPrefix}-pass");
+                Regex.Unescape(secret.Value);
+                Console.WriteLine("passphrase fetched");
             }
             else
             {
@@ -32,6 +56,14 @@ namespace proto_azure_pgp
             certStore.Close();
 
             Console.WriteLine("it's over");
+        }
+
+        private static async Task<string> GetAccessTokenAsync(string authority, string resource, string scope)
+        {
+            var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
+            var result = await context.AcquireTokenAsync(resource, Cert);
+
+            return result.AccessToken;
         }
     }
 }

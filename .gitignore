@@ -1,5 +1,7 @@
 .terraform/
 terraform.tfstate*
+terraform.tfstate*
+*.tfvars
 bin/
 obj/
 .deploy/
