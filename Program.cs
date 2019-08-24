@@ -17,11 +17,13 @@ namespace proto_azure_pgp
                                         Environment.GetEnvironmentVariable("WEBSITE_LOAD_CERTIFICATES"),
                                         false);
             // Get the first cert with the thumbprint
+            Console.WriteLine($"cert collection count: {certCollection.Count}");
             if (certCollection.Count > 0)
             {
                 X509Certificate2 cert = certCollection[0];
                 // Use certificate
-                Console.WriteLine(cert.FriendlyName);
+                Console.WriteLine($"friendly name: {cert.FriendlyName}");
+                Console.WriteLine($"subject: {cert.Subject}");
             }
             else
             {
