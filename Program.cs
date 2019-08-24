@@ -23,10 +23,13 @@ namespace proto_azure_pgp
                 // Use certificate
                 Console.WriteLine(cert.FriendlyName);
             }
+            else
+            {
+                Console.WriteLine("no certs fetched");
+            }
             certStore.Close();
 
-            
-            Console.WriteLine("thing done");
+            Console.WriteLine("it's over");
         }
     }
 }
