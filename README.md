@@ -10,7 +10,7 @@ I followed this [post](https://blogs.msdn.microsoft.com/benjaminperkins/2017/03/
 1. Zip the publish directory
 1. Upload the zip file to the webjob in the Azure portal
 
-Steps as of 2019-08-24:
+## Steps as of 2019-08-24:
 ~1. Fix the hellow world version of the continuous web job getting stuck on "Pending Restart" - I think it's because it doesn't loop. it just terminates after printing hello world~
 1. Add code from this the ssl [docs](https://docs.microsoft.com/en-us/azure/app-service/app-service-web-ssl-cert-load) to the console app
 1. Try running on the app service
@@ -18,8 +18,7 @@ Steps as of 2019-08-24:
   1. I did import the cert so we could fetch it from the app service
 1. Try to fetch secrets from key vault using the cert
 
-Next steps:
-1. Figure out why I'm getting:
+## Figure out why I'm getting:
 ```
 [08/24/2019 22:24:22 > 580242: ERR ] Unhandled Exception: Microsoft.Azure.KeyVault.Models.KeyVaultErrorException: Client address is not authorized and caller is not a trusted service.
 [08/24/2019 22:24:22 > 580242: ERR ] Client address: <ip address of app service i guess>
@@ -30,6 +29,12 @@ Next steps:
 [08/24/2019 22:24:22 > 580242: ERR ]    at proto_azure_pgp.Program.Main(String[] args) in /Users/gabe/dev/proto-azure-pgp/Program.cs:line 42
 [08/24/2019 22:24:22 > 580242: ERR ]    at proto_azure_pgp.Program.<Main>(String[] args)
 ```
+1. Added app service as AD identity in App Service > Identity
+1. Add access policy for that specific identity - Got the same error
+1. Tried adding the app service to the VNET the KV is in. Got this error:
+  - > Legacy Cmak generation is not supported for gateway id <path to VNET gateway i think?> when vpn client protocol IkeV2 is configured. Please use vpn profile package option instead."
+1. Found this note on Key Vault "Firewalls and virtual networks" section near the "Allow trusted Microsoft service to bypass this firewall option":
+  - > This setting is related to firewall only. In order to access this key vault, the trusted service must also be given explicit permissions in the Access policies section.
 
 # Deploy
 
