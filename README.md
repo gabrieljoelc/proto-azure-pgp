@@ -15,3 +15,15 @@ Next steps:
 1. Add code from this the ssl [docs](https://docs.microsoft.com/en-us/azure/app-service/app-service-web-ssl-cert-load) to the console app
 1. Try running on the app service
 1. If that doesn't work, import the cert from key vault?
+
+
+# Deploy on *nix
+
+Pre-requesites:
+- az CLI
+- dotnet CLI
+- zip command
+
+```bash
+AZURE_RESOURCE_GROUP=my-resource-ggroup AZURE_APP_SERVICE=my-app-service ./deploy.sh
+```

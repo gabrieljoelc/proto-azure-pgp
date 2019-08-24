@@ -3,3 +3,4 @@ terraform.tfstate*
 bin/
 obj/
 .deploy/
+deploy.zip
