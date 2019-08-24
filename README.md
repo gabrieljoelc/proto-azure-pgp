@@ -1,3 +1,27 @@
+# Deploy
+
+Pre-requesites:
+- terraform
+- az CLI
+- dotnet CLI
+- \*nix os or something for zip command in `deploy.sh`
+- zip command
+
+1. Create resources:
+```
+terraform apply -var='app_settings={"APPLICATION_ID":"123","KEY_VAULT_URL":"https://mykeyvault.vault.azure.com","VAULT_KEY_PREFIX":"boknows","WEBSITE_LOAD_CERTIFICATES":"456"}'
+```
+2. Deploy code:
+```bash
+AZURE_RESOURCE_GROUP=my-resource-group AZURE_APP_SERVICE=my-app-service ./deploy.sh
+```
+or with environment variables:
+```
+AZURE_RESOURCE_GROUP=my-resource-group AZURE_APP_SERVICE=my-app-service ./deploy.sh
+```
+
+# Solution Progress
+
 Tried using terraform registry module but it had a bug where it defaulted to Linux but it didn't set a required field (reserved)
 
 I opened a PR for that and used my local version to create the resources. I discovered that web jobs are not supported for Linux app services...
@@ -35,25 +59,3 @@ I followed this [post](https://blogs.msdn.microsoft.com/benjaminperkins/2017/03/
   - > Legacy Cmak generation is not supported for gateway id <path to VNET gateway i think?> when vpn client protocol IkeV2 is configured. Please use vpn profile package option instead."
 1. Found this note on Key Vault "Firewalls and virtual networks" section near the "Allow trusted Microsoft service to bypass this firewall option":
   - > This setting is related to firewall only. In order to access this key vault, the trusted service must also be given explicit permissions in the Access policies section.
-
-# Deploy
-
-Pre-requesites:
-- terraform
-- az CLI
-- dotnet CLI
-- \*nix os or something for zip command in `deploy.sh`
-- zip command
-
-1. Create resources:
-```
-terraform apply -var='app_settings={"APPLICATION_ID":"123","KEY_VAULT_URL":"https://mykeyvault.vault.azure.com","VAULT_KEY_PREFIX":"boknows","WEBSITE_LOAD_CERTIFICATES":"456"}'
-```
-2. Deploy code:
-```bash
-AZURE_RESOURCE_GROUP=my-resource-group AZURE_APP_SERVICE=my-app-service ./deploy.sh
-```
-or with environment variables:
-```
-AZURE_RESOURCE_GROUP=my-resource-group AZURE_APP_SERVICE=my-app-service ./deploy.sh
-```
