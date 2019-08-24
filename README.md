@@ -57,5 +57,6 @@ I followed this [post](https://blogs.msdn.microsoft.com/benjaminperkins/2017/03/
 1. Add access policy for that specific identity - Got the same error
 1. Tried adding the app service to the VNET the KV is in. Got this error:
   - > Legacy Cmak generation is not supported for gateway id <path to VNET gateway i think?> when vpn client protocol IkeV2 is configured. Please use vpn profile package option instead."
-1. Found this note on Key Vault "Firewalls and virtual networks" section near the "Allow trusted Microsoft service to bypass this firewall option":
-  - > This setting is related to firewall only. In order to access this key vault, the trusted service must also be given explicit permissions in the Access policies section.
+4. Found this note on Key Vault "Firewalls and virtual networks" section near the "Allow trusted Microsoft service to bypass this firewall option":
+> This setting is related to firewall only. In order to access this key vault, the trusted service must also be given explicit permissions in the Access policies section.
+  - I need to keep this in mind because originally I was try and avoid step 2. I need to see if there's a more scalable way to do it though (e.g. add app service to security group or principal or something?)
