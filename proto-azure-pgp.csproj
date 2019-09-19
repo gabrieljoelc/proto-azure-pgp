@@ -10,6 +10,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.4" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.1" />
+    <PackageReference Include="PgpCore" Version="1.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="samplepgpfile.txt.pgp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

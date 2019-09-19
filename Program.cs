@@ -1,10 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using PgpCore;
 
 namespace proto_azure_pgp
 {
@@ -12,6 +15,8 @@ namespace proto_azure_pgp
     {
         private static ClientAssertionCertificate Cert { get; set; }
         private static KeyVaultClient Client { get; set; } 
+        private static PGP _pgp = new PGP();
+
         static async Task Main(string[] args)
         {
             Console.WriteLine("Hello World!");
@@ -40,14 +45,45 @@ namespace proto_azure_pgp
 
                 var secret = new SecretBundle();
                 secret = await Client.GetSecretAsync(vaultUrl, $"{vaultKeyPrefix}-public");
-                Regex.Unescape(secret.Value);
-                Console.WriteLine("public fetched");
+                var publicKey = Regex.Unescape(secret.Value);
+                Console.WriteLine($"public fetched");
                 secret = await Client.GetSecretAsync(vaultUrl, $"{vaultKeyPrefix}-private");
-                Regex.Unescape(secret.Value);
-                Console.WriteLine("private fetched");
+                var privateKey = Regex.Unescape(secret.Value);
+                Console.WriteLine($"private fetched");
                 secret = await Client.GetSecretAsync(vaultUrl, $"{vaultKeyPrefix}-pass");
-                Regex.Unescape(secret.Value);
-                Console.WriteLine("passphrase fetched");
+                var PassPhrase = Regex.Unescape(secret.Value);
+                Console.WriteLine($"passphrase fetched");
+
+                try
+                {
+                    Console.WriteLine("Opening file streams");
+
+                    /*
+                     * Replace this PGP file with one you have encrypted with your private key already.
+                     * It is unlikely that this key will work.
+                     */
+                    var inputStream = File.Open("./samplepgpfile.txt.txt.pgp", FileMode.Open, FileAccess.ReadWrite);
+                    var outStream = new MemoryStream();
+
+                    Console.WriteLine("Creating Private Key Stream");
+                    var privateKeyStream = new MemoryStream(Encoding.UTF8.GetBytes(privateKey));
+                    PassPhrase = PassPhrase == "0" ? null : PassPhrase;
+
+                    Console.WriteLine("decrypting");
+                    await _pgp.DecryptStreamAsync(inputStream, outStream, privateKeyStream, PassPhrase);
+
+                    Console.WriteLine("Decrypted");
+                    using (var outputStream = File.Open("./output.txt", FileMode.Create, FileAccess.Write))
+                        outStream.WriteTo(outputStream);
+                    outStream.Dispose();
+                    Console.WriteLine("File created");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error");
+                    Console.WriteLine(ex.Message); //A Message of No key found would indicate that we have the wrong key.
+                }
+                
             }
             else
             {
