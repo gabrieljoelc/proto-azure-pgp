@@ -6,3 +6,4 @@ bin/
 obj/
 .deploy/
 deploy.zip
+.vs/
